@@ -21,7 +21,16 @@ The code requires a directory containing the following files:
 
 An example of this directory is shown in `sample_dataset/`.
 
+To crop imgs and generate `train_ids.csv` and `test_ids.csv` in `output_dir/csv`
+run:
+```
+python pre_train --images_folder path_to_images --output_dir path_for_generated_files
+```
+
 To generate the `aus_openface.pkl` extract each image Action Units with [OpenFace](https://github.com/TadasBaltrusaitis/OpenFace/wiki/Action-Units) and store each output in a csv file the same name as the image. Then run:
+```
+./FaceLandmarkImg -fdir path_to_images -out_dir path_for_generated_files -aus
+```
 ```
 python data/prepare_au_annotations.py
 ```
@@ -29,7 +38,7 @@ python data/prepare_au_annotations.py
 ## Run
 To train:
 ```
-bash launch/run_train.sh
+python train.py --data_dir path/to/dataset/ --name experiment_1 --batch_size 25 
 ```
 To test:
 ```
