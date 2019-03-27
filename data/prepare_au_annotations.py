@@ -15,8 +15,10 @@ def get_data(filepaths):
     data = dict()
     for filepath in tqdm(filepaths):
         content = np.loadtxt(filepath, delimiter=', ', skiprows=1)
-        data[os.path.basename(filepath[:-4])] = content[2:19]
-
+        if content.ndim == 1:
+            data[os.path.basename(filepath[:-4])] = content[2:19]
+        if content.ndim == 2:
+            data[os.path.basename(filepath[:-4])] = content[0][2:19]
     return data
 
 def save_dict(data, name):
