@@ -32,7 +32,7 @@ To generate the `aus_openface.pkl` extract each image Action Units with [OpenFac
 ./FaceLandmarkImg -fdir path_to_images -out_dir path_for_generated_files -aus
 ```
 ```
-python data/prepare_au_annotations.py
+python data/prepare_au_annotations.py -ia input_aus_filesdir -op output_path
 ```
 
 ## Run
