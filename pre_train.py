@@ -1,3 +1,5 @@
+import argparse
+
 import cv2
 import os
 import csv
@@ -6,9 +8,11 @@ import random
 import face_recognition
 from PIL import Image
 
-from options.test_options import TestOptions
+import numpy as np
 from utils import cv_utils, face_utils
-
+from multiprocessing import Pool, Process, Manager
+import threading
+from queue import Queue
 
 class CropFaces:
     def __init__(self, opt):
@@ -39,17 +43,48 @@ class CropFaces:
 
 
 def main():
-    opt = TestOptions().parse()
+    MAX_THREADS = 8
+    print("Using %s threads" % MAX_THREADS)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--images_folder', type=str, help='path to image')
+    parser.add_argument('--output_dir', type=str, default='./output', help='output path')
+
+    opt = parser.parse_args()
+
     if not os.path.isdir(opt.output_dir):
         os.makedirs(opt.output_dir)
 
     assert os.path.isdir(opt.images_folder), '%s is not a valid directory' % dir
 
+    paths = []
+
     for root, _, fnames in sorted(os.walk(opt.images_folder)):
         for fname in fnames:
             path = os.path.join(root, fname)
-            morph = CropFaces(opt)
-            morph.morph_file(path)
+            paths.append(path)
+
+    paths_clusters = np.array_split(np.asarray(paths), MAX_THREADS)
+
+    def crop_photo(p_c):
+        for p in p_c:
+            try:
+                morph = CropFaces(opt)
+                morph.morph_file(p)
+                print(p)
+            except Exception as err:
+                pass
+
+    manager = Manager()
+    processes = []
+    for c in range(MAX_THREADS):
+        p = Process(target=crop_photo, args=(paths_clusters[c],))
+        processes.append(p)
+    # Start the processes
+    for p in processes:
+        p.start()
+    # Ensure all processes have finished execution
+    for p in processes:
+        p.join()
 
     image_list = []
     for root, _, fnames in sorted(os.walk(opt.output_dir)):
@@ -58,8 +93,8 @@ def main():
             image_list.append(path)
 
     if len(image_list) > 0:
-        train = random.sample(image_list, k=int(len(image_list) * 0.7))
-        test = random.sample(image_list, k=int(len(image_list) * 0.3))
+        train = random.sample(image_list, k=int(len(image_list) * 0.8))
+        test = random.sample(image_list, k=int(len(image_list) * 0.2))
         if not os.path.isdir('%s/csv' % opt.output_dir):
             os.makedirs('%s/csv' % opt.output_dir)
         with open('%s/csv/train_ids.csv' % opt.output_dir, 'w', newline='') as csvfile:
