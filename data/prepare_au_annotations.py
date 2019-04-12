@@ -1,3 +1,6 @@
+import csv
+import random
+
 import numpy as np
 import os
 from tqdm import tqdm
@@ -35,6 +38,25 @@ def main():
     if not os.path.isdir(args.output_path):
         os.makedirs(args.output_path)
     save_dict(data, os.path.join(args.output_path, "aus"))
+
+    image_list = []
+    for filepath in tqdm(filepaths):
+        path = filepath[:-4]
+        image_list.append(path)
+
+    if len(image_list) > 0:
+        train = random.sample(image_list, k=int(len(image_list) * 0.8))
+        test = random.sample(image_list, k=int(len(image_list) * 0.2))
+        if not os.path.isdir('%s/csv' % args.output_path):
+            os.makedirs('%s/csv' % args.output_path)
+        with open('%s/csv/train_ids.csv' % args.output_path, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for img in train:
+                writer.writerow([img])
+        with open('%s/csv/test_ids.csv' % args.output_path, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for img in test:
+                writer.writerow([img])
 
 
 if __name__ == '__main__':
