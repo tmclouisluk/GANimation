@@ -29,7 +29,9 @@ python pre_train --images_folder path_to_images --output_dir path_for_generated_
 
 To generate the `aus_openface.pkl` extract each image Action Units with [OpenFace](https://github.com/TadasBaltrusaitis/OpenFace/wiki/Action-Units) and store each output in a csv file the same name as the image. Then run:
 ```
-./FaceLandmarkImg -fdir path_to_images -out_dir path_for_generated_files -aus
+cd OpenFace 
+cd build
+./bin/FaceLandmarkImg -fdir path_to_images -out_dir path_for_generated_files -aus
 ```
 ```
 python data/prepare_au_annotations.py -ia input_aus_filesdir -op output_path
