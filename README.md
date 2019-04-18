@@ -44,7 +44,7 @@ python train.py --data_dir path/to/dataset/ --name experiment_1 --batch_size 25
 ```
 To test:
 ```
-python test --input_path path/to/img
+python test --input_path path/to/img --output_dir path/to/output --face_aus_path path/of/ausfile
 ```
 
 ## Citation
